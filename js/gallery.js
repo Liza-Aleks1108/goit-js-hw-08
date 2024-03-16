@@ -1,5 +1,3 @@
-// Завдання — Галерея зображень
-
 const images = [
   {
     preview:
@@ -90,6 +88,7 @@ const createGallery = arr => {
 
 // Додаємо Gallery в html
 gallery.innerHTML = createGallery(images);
+let instance;
 
 // Функція для обробки кліків по галереї
 const handleClick = event => {
@@ -100,24 +99,28 @@ const handleClick = event => {
 
   const largeImageURL = target.dataset.source;
   const descriptionCurrent = target.alt;
-  console.log(largeImageURL);
-  console.log(descriptionCurrent);
 
   // Створюємо модальне вікно
-  const instance = basicLightbox.create(
-    `<div class="modal"><img src="${largeImageURL}" alt="${descriptionCurrent}"></div>`
+  instance = basicLightbox.create(
+    `<div class="modal"><img src="${largeImageURL}" alt="${descriptionCurrent}"></div>`,
+    {
+      onShow: () => {
+        document.addEventListener('keydown', handleKey);
+      },
+      onClose: () => {
+        document.removeEventListener('keydown', handleKey);
+      },
+    }
   );
   // Відкриваємо модальне вікно
   instance.show();
+};
 
-  // Додатково закриття за допомогою Escape
-  const handleKey = event => {
-    if (event.code === 'Escape' && instance.visible()) {
-      instance.close();
-      console.log('Close');
-    }
-  };
-  gallery.addEventListener('keydown', handleKey, { once: true });
+// Додатково закриття за допомогою Escape
+const handleKey = event => {
+  if (event.code === 'Escape') {
+    instance.close();
+  }
 };
 
 gallery.addEventListener('click', handleClick);
